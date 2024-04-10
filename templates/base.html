@@ -16,7 +16,7 @@
 <!-- Navigation -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
-        <a class="navbar-brand" href="/">Who's At My Feeder?</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">Who's At My Feeder?</a>
         {% if title_text %}
         <span class="navbar-text">
             {% if title_link %}

@@ -7,10 +7,27 @@ from queries import (get_common_name, get_daily_summary,
                      get_earliest_detection_date, get_records_for_date_hour,
                      get_records_for_scientific_name_and_date,
                      recent_detections)
-from util import load_config
+from util import load_config, setupdb
+
+
+class ReverseProxied(object):
+    def __init__(self, app):
+        self.app = app
+
+    def __call__(self, environ, start_response):
+        script_name = environ.get("HTTP_X_INGRESS_PATH", "")
+        if script_name:
+            environ["SCRIPT_NAME"] = script_name
+        else:
+            print(f"HTTP_X_INGRESS_PATH: {script_name}", flush=True)
+        return self.app(environ, start_response)
+
 
 app = Flask(__name__)
+app.wsgi_app = ReverseProxied(app.wsgi_app)
+
 config = load_config()
+setupdb()
 DBPATH = config["database"]["path"]
 NAMEDBPATH = config["classification"]["name_database"]
 
@@ -128,6 +145,12 @@ def show_detections_by_scientific_name(scientific_name, date, end_date):
             common_name=get_common_name(scientific_name),
             records=records,
         )
+
+
+@app.route("/daily_summary/")
+def show_daily_summary_dummy(date):
+    # Return a 404, the user shouldn't be here.
+    abort(404)
 
 
 @app.route("/daily_summary/<date>")

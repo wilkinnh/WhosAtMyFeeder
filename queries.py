@@ -125,9 +125,9 @@ def get_records_for_date_hour(date, hour):
             record["display_name"]
         )  # Access the field by name
         record_dict = dict(record)  # Convert the record to a dictionary
-        record_dict[
-            "common_name"
-        ] = common_name  # Add the 'common_name' key to the record dictionary
+        record_dict["common_name"] = (
+            common_name  # Add the 'common_name' key to the record dictionary
+        )
         result.append(record_dict)
 
     conn.close()
@@ -158,9 +158,9 @@ def get_records_for_scientific_name_and_date(scientific_name, date):
             record["display_name"]
         )  # Access the field by name
         record_dict = dict(record)  # Convert the record to a dictionary
-        record_dict[
-            "common_name"
-        ] = common_name  # Add the 'common_name' key to the record dictionary
+        record_dict["common_name"] = (
+            common_name  # Add the 'common_name' key to the record dictionary
+        )
         result.append(record_dict)
 
     conn.close()

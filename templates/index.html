@@ -6,7 +6,7 @@
 
 {% block date_picker %}
   <form class="d-flex">
-      <input type="date" id="date-picker" class="form-control" value="{{ date }}" min="{{ earliest_date }}" max="{{ date }}" onchange="navigateToDailySummary(this)" />
+      <input type="date" id="date-picker" class="form-control" value="{{ date }}" min="{{ earliest_date }}" max="{{ date }}" data-daily-summary-url="{{ url_for('show_daily_summary_dummy') }}" onchange="navigateToDailySummary(this)" />
   </form>
 {% endblock %}
 
@@ -83,7 +83,8 @@
     <script>
         function navigateToDailySummary(input) {
             const selectedDate = input.value;
-            window.location.href = `/daily_summary/${selectedDate}`;
+            const baseUrl = input.getAttribute('data-daily-summary-url');
+            window.location.href = baseUrl + selectedDate;
         }
     </script>
 {% endblock %}

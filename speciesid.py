@@ -1,5 +1,4 @@
 import json
-import multiprocessing
 import sqlite3
 import sys
 import time
@@ -13,8 +12,7 @@ from PIL import Image, ImageOps
 from tflite_support.task import core, processor, vision
 
 from queries import get_common_name
-from util import load_config
-from webui import app
+from util import load_config, setupdb
 
 classifier = None
 config = load_config()
@@ -234,33 +232,6 @@ def on_message(client, userdata, message):
     conn.close()
 
 
-def setupdb():
-    conn = sqlite3.connect(DBPATH)
-    cursor = conn.cursor()
-    cursor.execute(
-        """    
-        CREATE TABLE IF NOT EXISTS detections (    
-            id INTEGER PRIMARY KEY AUTOINCREMENT,  
-            detection_time TIMESTAMP NOT NULL,  
-            detection_index INTEGER NOT NULL,  
-            score REAL NOT NULL,  
-            display_name TEXT NOT NULL,  
-            category_name TEXT NOT NULL,  
-            frigate_event TEXT NOT NULL UNIQUE,
-            camera_name TEXT NOT NULL 
-        )    
-    """
-    )
-    conn.commit()
-
-    conn.close()
-
-
-def run_webui():
-    print("Starting flask app", flush=True)
-    app.run(debug=False, host=config["webui"]["host"], port=config["webui"]["port"])
-
-
 def run_mqtt_client():
     print(
         "Starting MQTT client. Connecting to: " + config["frigate"]["mqtt_server"],
@@ -311,15 +282,8 @@ def main():
 
     # setup database
     setupdb()
-    print("Starting threads for Flask and MQTT", flush=True)
-    flask_process = multiprocessing.Process(target=run_webui)
-    mqtt_process = multiprocessing.Process(target=run_mqtt_client)
-
-    flask_process.start()
-    mqtt_process.start()
-
-    flask_process.join()
-    mqtt_process.join()
+    print("Starting MQTT (flask disabled, use gunicorn)", flush=True)
+    run_mqtt_client()
 
 
 if __name__ == "__main__":
