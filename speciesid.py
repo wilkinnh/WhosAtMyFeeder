@@ -149,6 +149,7 @@ def on_message(client, userdata, message):
                 if (
                     index != 964 and score > config["classification"]["threshold"]
                 ):  # 964 is "background"
+                    client.publish( 'whosatmyfeeder/detections', get_common_name(display_name), qos=0, retain=False)
                     cursor = conn.cursor()
 
                     # Check if a record with the given frigate_event exists
